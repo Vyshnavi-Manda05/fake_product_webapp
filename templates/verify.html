@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Verify Product</title>
+    <script src="https://unpkg.com/html5-qrcode/minified/html5-qrcode.min.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; background: #eef2f3; }
+        #reader { width: 350px; margin: 20px auto; }
+        .result-box { background: white; padding: 15px; border-radius: 8px; width: 400px; margin: 20px auto; box-shadow: 0 0 8px rgba(0,0,0,0.2); }
+        .auth { color: green; font-weight: bold; }
+        .fake { color: red; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h2>Verify Product</h2>
+    <p>Scan the QR code below using your camera.</p>
+
+    <div id="reader"></div>
+
+    <form method="POST" id="verifyForm">
+        <input type="hidden" name="qr_data" id="qr_data">
+    </form>
+
+    {% if result %}
+    <div class="result-box">
+        <h3>Verification Result</h3>
+        <p class="{% if 'Authentic' in result %}auth{% else %}fake{% endif %}">
+            {{ result }}
+        </p>
+
+        {% if details %}
+        <p><b>ID:</b> {{ details.id }}</p>
+        <p><b>Name:</b> {{ details.name }}</p>
+        <p><b>Manufacturer:</b> {{ details.manufacturer }}</p>
+        <p><b>Expiry:</b> {{ details.expiry }}</p>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    <script>
+        function onScanSuccess(decodedText) {
+            document.getElementById("qr_data").value = decodedText;
+            document.getElementById("verifyForm").submit();
+        }
+
+        function onScanFailure(error) {
+            // Ignore scan errors
+        }
+
+        let scanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: 250 });
+        scanner.render(onScanSuccess, onScanFailure);
+    </script>
+</body>
+</html>
